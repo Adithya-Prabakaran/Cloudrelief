@@ -9,6 +9,7 @@ from app.models.db import Base
 from app.routers import auth, files, incidents
 
 logging.basicConfig(level=logging.INFO)
+logging.info("CORS_ORIGINS=%s", settings.CORS_ORIGINS)
 
 app = FastAPI(title=settings.APP_NAME)
 

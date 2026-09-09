@@ -48,9 +48,11 @@ class Settings:
     CLOUDINARY_URL: str = os.getenv("CLOUDINARY_URL", "")
 
     # --- CORS ---
-    CORS_ORIGINS: list[str] = os.getenv(
-        "CORS_ORIGINS", "http://localhost:5173,http://localhost:5174"
-    ).split(",")
+    CORS_ORIGINS: list[str] = [
+        origin.strip()
+        for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
+        if origin.strip()
+    ]
 
     # --- Severity scoring constants (see app/core/severity.py) ---
     URGENCY_WEIGHT: float = float(os.getenv("URGENCY_WEIGHT", "0.2"))
