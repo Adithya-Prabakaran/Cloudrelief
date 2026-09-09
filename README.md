@@ -42,6 +42,29 @@ cloudrelief/
   .env.example         all provider switches + secrets, commented
 ```
 
+## Deploying for free
+
+The whole stack runs on free tiers of three services, wired via `render.yaml`:
+
+| Piece | Host | Why |
+|---|---|---|
+| Frontend | Render Static Site | Free, always-on (no cold start) |
+| Backend | Render Web Service (Docker) | Free; sleeps after 15 min idle, wakes on next request |
+| Database | [Neon](https://neon.tech) Postgres | Free tier persists indefinitely (Render's free Postgres expires after 30 days) |
+| Photo storage | [Cloudinary](https://cloudinary.com) | Free tier; Render's free web service has an ephemeral disk, so local-filesystem storage would lose photos on every restart |
+
+Steps:
+1. Create a free [Neon](https://neon.tech) project, copy its connection string, and rewrite it as
+   `postgresql+psycopg2://...?sslmode=require` (Neon requires SSL).
+2. Create a free [Cloudinary](https://cloudinary.com) account and copy the "API Environment variable"
+   (`CLOUDINARY_URL=cloudinary://<key>:<secret>@<cloud_name>`) from the dashboard.
+3. On [Render](https://dashboard.render.com), New → Blueprint → connect this GitHub repo. It reads
+   `render.yaml` and creates both services.
+4. Fill in the env vars Render leaves blank: `DATABASE_URL` (from step 1), `CLOUDINARY_URL` (from step 2),
+   and on the frontend service, `VITE_API_URL` (the backend service's `.onrender.com` URL from step 3).
+5. Once the frontend has a URL, set `CORS_ORIGINS` on the backend service to that URL and redeploy the backend.
+6. Seed demo data once: Render dashboard → backend service → Shell → `python -m app.db.seed`.
+
 ## Running locally
 
 Requires Docker + Docker Compose.

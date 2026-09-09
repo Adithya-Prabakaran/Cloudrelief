@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: cloudrelief-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /docs
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRE_MINUTES
+        value: "1440"
+      - key: STORAGE_PROVIDER
+        value: cloudinary
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: AUTH_PROVIDER
+        value: local
+      - key: NOTIFY_PROVIDER
+        value: console
+      - key: CLASSIFIER_PROVIDER
+        value: mock
+      - key: CORS_ORIGINS
+        sync: false
+      - key: URGENCY_WEIGHT
+        value: "0.2"
+      - key: DENSITY_CAP
+        value: "5"
+      - key: DENSITY_WEIGHT
+        value: "1.0"
+      - key: ALERT_THRESHOLD
+        value: "0.6"
+      - key: DENSITY_RADIUS_KM
+        value: "5"
+      - key: DENSITY_WINDOW_HOURS
+        value: "24"
+
+  - type: web
+    name: cloudrelief-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
