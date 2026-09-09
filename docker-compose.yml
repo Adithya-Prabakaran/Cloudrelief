@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloudrelief-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cloudrelief
+      POSTGRES_PASSWORD: cloudrelief
+      POSTGRES_DB: cloudrelief
+    ports:
+      - "5432:5432"
+    volumes:
+      - cloudrelief_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cloudrelief"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: cloudrelief-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://cloudrelief:cloudrelief@postgres:5432/cloudrelief
+      LOCAL_STORAGE_DIR: /app/storage/uploads
+      FILES_BASE_URL: http://localhost:8000/files
+      CORS_ORIGINS: http://localhost:5174
+    ports:
+      - "8000:8000"
+    volumes:
+      - cloudrelief_uploads:/app/storage/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: cloudrelief-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "5174:5174"
+    depends_on:
+      - backend
+
+volumes:
+  cloudrelief_pgdata:
+  cloudrelief_uploads:

@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-fog font-sans text-ink antialiased;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-serif font-normal;
+}
+
+::selection {
+  @apply bg-peach text-sienna;
+}

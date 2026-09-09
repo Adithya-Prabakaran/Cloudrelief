@@ -1,0 +1,23 @@
+# Env / secrets
+.env
+
+# Python
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Uploaded files (local storage stand-in for S3)
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
+
+# Benchmark output
+benchmark/results/
+benchmark/*.csv
+
+# OS
+.DS_Store
